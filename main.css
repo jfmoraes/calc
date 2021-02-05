@@ -1,0 +1,74 @@
+
+body {
+  background-color: #F6F6F6;
+}
+
+#container {
+  display: flex;
+  height: 700px;
+  margin: auto;
+  width: 95%;
+}
+
+#column {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+
+#sidebar {
+  background-color: white;
+  height: inherit;
+  width: 30%;
+}
+
+
+
+
+
+
+#output {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  height: 200px;
+  width: 100%;
+}
+
+table {
+  background-color: #F6F6F6;
+  align-content: center;
+  height: 50px;
+  width: 100%;
+}
+
+th {
+  width: 25%;
+}
+
+button {
+  font-size: 30px;
+  height: 80px;
+  width: 100%;
+}
+
+#expression-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#expression, #evaluation {
+  color: black;
+  text-align: right;
+}
+ 
+#input {
+  font-size: 30px;
+}
+
+
+
+
+
+
