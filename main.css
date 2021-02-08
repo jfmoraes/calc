@@ -4,7 +4,8 @@
 
 
 body {
-  background-color: #F6F6F6;
+  /*background-color: #F6F6F6;*/
+  background-color: black;
 }
 
 #container {
@@ -32,7 +33,8 @@ body {
 
 
 #output {
-  background-color: white;
+  background-color: black;
+  color: white;
   display: flex;
   flex-direction: column;
   text-align: right;
@@ -63,7 +65,7 @@ button {
 }
 
 #expression, #evaluation {
-  color: black;
+  color: white;
   text-align: right;
 }
  
@@ -72,7 +74,9 @@ button {
   font-family: 'Black Ops One', cursive;
 }
 
-
+li {
+  display: block;
+}
 
 
 

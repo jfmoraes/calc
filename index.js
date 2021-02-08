@@ -58,8 +58,16 @@ var calculator = {
     var keys = document.getElementsByTagName("button")
     for (let index = 0; index < keys.length; index++){
       keys[index].onclick = function () {
-        
         switch (keys[index].name) {
+          case "clear":
+            calculator.clear()
+            break;
+          case "clearEntry":
+            calculator.clearEntry()
+            break;
+          case "lastDigit":
+            calculator.clearLastDigit()
+            break;
           case "digit":
             let digit = calculator.digits[keys[index].id]
             calculator.addDigit(digit)
@@ -102,6 +110,7 @@ var calculator = {
     ).toLocaleString()
   },
   addDigit: function (digit) {
+    // If an operator was issued, we reset the digitQueue to allow a new number composition 
     if (this.operator) {
       this.operator = null
       calculator.resetDigitQueue()
@@ -116,19 +125,19 @@ var calculator = {
 
   addition: function () {
     this.operator = "+"
-    return calculator.setExpression("+")
+    return calculator.setExpression()
   },
   subtraction: function () {
     this.operator = "-"
-    return calculator.setExpression("-")
+    return calculator.setExpression()
   },
   division: function () {
     this.operator = "/"
-    return calculator.setExpression("/")
+    return calculator.setExpression()
   },
   multiplication: function () {
     this.operator = "*";
-    return calculator.setExpression("*")
+    return calculator.setExpression()
   },
   unary: function () {
     if (calculator.digitQueue) {
@@ -148,16 +157,30 @@ var calculator = {
   },
   equals: function () {
     this.operator = "=";
-    this.setExpression("=");
+    this.setExpression();
     var evaluation = eval(calculator.expression.join(""))
     calculator.appendHistoryChild()
     return calculator.updateUserInput(evaluation)
   },
   appendHistoryChild: function () {
+    var history = document.getElementById("history")
     var li = document.createElement("li")
     var textNode = document.createTextNode(calculator.expression.join(""))
-    var history = document.getElementById("history")
-    return history.appendChild(textNode)
+    li.appendChild(textNode)
+    return history.appendChild(li)
+  },
+  clearHistory: function () {
+    this.expression = []
+    this.history = []
+  },
+  clear: function () {
+    return calculator.defaultInput()
+  },
+  clearEntry: function () {
+    return calculator.resetDigitQueue()
+  },
+  clearLastDigit: function () {
+    
   },
   updateUserInput: function (userInput) {
     var input = userInput.toString()
@@ -166,8 +189,9 @@ var calculator = {
         calculator.addDigit(input[digit])
       }
     }
+    return this.clearHistory()
   },
-  setExpression: function (operator) {
+  setExpression: function () {
     if (this.operator !== '=') {  
       calculator.expression.push(this.userInput, this.operator)
     } else {
