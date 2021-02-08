@@ -4,25 +4,18 @@ var calculator = {
   startup: function () {
     calculator.insertValueOnTHML();
     calculator.insertOperatorOnHTML();
-    calculator.initDefault();
+    calculator.defaultInput();
     calculator.onclickFunction();
-    
   },
   evaluation: null,
   expression: [],
-
+  expressionLocale: [],
   digitQueue: [],
-
-  defaultInput: [0],
   userInput: null,
   userInputLocale: null,
-  lOperand: null,
-  rOperand: null,
-  lOperandLocale: null,
-  rOperandLocale: null,
   operator: null,
+  operatorLocale: null,
   operatorStack: [],
-  
   digits: {
     "zero": 0,
     "one": 1,
@@ -45,17 +38,11 @@ var calculator = {
     "comma": ","
   },
   history: [],
-  initDefault: function () {
-    console.log('...')
-    /*
-    if (calculator.digitQueue.length === 1 && calculator.digitQueue[0] === 0) {
-      this.lOperand = this.stringToNumber()
-      this.lOperandLocale = this.numberToLocaleString()
-      return calculator.renderOutput()
-    }
-    */
+  defaultInput: function () {
     return calculator.addDigit(0)
-    
+  },
+  resetDigitQueue: function () {
+    calculator.digitQueue = []
   },
   insertValueOnTHML: function () {
     for(var digit in this.digits){
@@ -68,13 +55,13 @@ var calculator = {
     }
   },
   onclickFunction: function () {
-    var buttons = document.getElementsByTagName("button")
-    for (let index = 0; index < buttons.length; index++){
-      buttons[index].onclick = function () {
+    var keys = document.getElementsByTagName("button")
+    for (let index = 0; index < keys.length; index++){
+      keys[index].onclick = function () {
         
-        switch (buttons[index].name) {
+        switch (keys[index].name) {
           case "digit":
-            let digit = calculator.digits[buttons[index].id]
+            let digit = calculator.digits[keys[index].id]
             calculator.addDigit(digit)
             break;
           case "unary":
@@ -102,29 +89,6 @@ var calculator = {
       }
     }
   },
-  pushFinalExpression: function () {
-    if (this.lOperand && this.operator && this.rOperand) {
-      calculator.history.push(
-        `${this.lOperand} ${this.operator} ${this.rOperand}`
-      )
-    }
-    return this.cleanExpressionFields()
-  },
-  cleanExpressionFields: function () {
-    this.lOperand = null
-    this.operator = null
-    this.rOperand = null
-    return;
-  },
-  initialInputNotFound: function () {
-    if (calculator.digitQueue.length === 0) {
-      console.log(calculator.digitQueue.length, 'initialInputNotFound Error')
-      return true;
-    }
-  },
-  resetDigitQueue: function () {
-    return calculator.digitQueue = []
-  },
   stringToNumber: function () {
     return parseInt(
       calculator.digitQueue.join(""),
@@ -137,50 +101,34 @@ var calculator = {
       10
     ).toLocaleString()
   },
-  overwriteDefaultInput: function () {
-    
-  },
   addDigit: function (digit) {
-    console.log(calculator.digitQueue, calculator.digitQueue.join(""))
+    if (this.operator) {
+      this.operator = null
+      calculator.resetDigitQueue()
+    }
     calculator.digitQueue.push(digit)
-    console.log(calculator.digitQueue, calculator.digitQueue.join(""), )
-    
-    /*
-    if (!calculator.operator) {
-      this.lOperand = this.stringToNumber()
-      this.lOperandLocale = this.numberToLocaleString()
-    }
-    if (calculator.operator) {
-      this.rOperand = this.stringToNumber()
-      this.rOperandLocale = this.numberToLocaleString()
-    }
-    */
-    
-    if (!calculator.operator) {
-      this.userInput = this.stringToNumber()
-      this.userInputLocale = this.numberToLocaleString()
-    }
-
-    return calculator.renderOutput()
-
+    this.userInput = this.stringToNumber()
+    this.userInputLocale = this.numberToLocaleString()
+    //var isFloat = parseFloat(calculator.digitQueue.join(""), 10)
+    //var isInteger = parseInt(calculator.digitQueue.join(""), 10)
+    return calculator.renderUserInput()
   },
-  setExpression: function (operator) {
-    calculator.expression.push(this.userInputLocale)
-    calculator.expression.push(operator)
-    console.log('exp: ', calculator.expression)
-    return calculator.renderOutput()
-  },
+
   addition: function () {
+    this.operator = "+"
     return calculator.setExpression("+")
   },
   subtraction: function () {
-    
+    this.operator = "-"
+    return calculator.setExpression("-")
   },
   division: function () {
-    
+    this.operator = "/"
+    return calculator.setExpression("/")
   },
   multiplication: function () {
-    
+    this.operator = "*";
+    return calculator.setExpression("*")
   },
   unary: function () {
     if (calculator.digitQueue) {
@@ -192,37 +140,52 @@ var calculator = {
       calculator.digitQueue.unshift("-")
     }
   },
-
   addDecimalPoint: function () {
     if (calculator.digitQueue.indexOf(".") < 0) {
       calculator.digitQueue.push('.')
-      calculator.renderOutput()
+      calculator.renderUserInput()
     }
   },
   equals: function () {
-    console.log(Boolean(this.expression), this.expression,)
+    this.operator = "=";
+    this.setExpression("=");
+    var evaluation = eval(calculator.expression.join(""))
+    calculator.appendHistoryChild()
+    return calculator.updateUserInput(evaluation)
   },
-  pushExpressionToOutput: function () {
-    var output = document.getElementById("expression")
-    if (this.lOperand >= 0) {
-      output.innerText = `${this.lOperandLocale}`
-      if (this.operator) {
-        output.innerText = `${this.lOperandLocale} ${this.operator}`        
-        if (this.rOperand) {
-          output.innerText = `${this.lOperandLocale} ${this.operator} ${this.rOperandLocale}`
-          calculator.pushFinalExpression()
-        }
+  appendHistoryChild: function () {
+    var li = document.createElement("li")
+    var textNode = document.createTextNode(calculator.expression.join(""))
+    var history = document.getElementById("history")
+    return history.appendChild(textNode)
+  },
+  updateUserInput: function (userInput) {
+    var input = userInput.toString()
+    if (input.length >= 1) {
+      for (let digit = 0; digit < input.length ; digit++){
+        calculator.addDigit(input[digit])
       }
-    }     
+    }
   },
-  renderOutput: function () {
+  setExpression: function (operator) {
+    if (this.operator !== '=') {  
+      calculator.expression.push(this.userInput, this.operator)
+    } else {
+      calculator.expression.push(this.userInput)
+    }
+    calculator.expressionLocale.push(this.userInput, this.operator)
+    return calculator.renderExpression()
+  },
+  renderExpression: function () {
+    var output = document.getElementById("expression")
+    return output.innerText = calculator.expressionLocale.join("")
+  },
+  renderUserInput: function () {
+    // The current userInput is always displayed or replaced by an evaluation
     var input = document.getElementById("input")
-    
-    if (this.lOperand >= 0) {
+    if (this.userInput >= 0) {
       input.innerText = `${this.userInputLocale}`
     }
-
-
   }
 
 

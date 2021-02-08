@@ -1,4 +1,8 @@
 
+/* Black Ops One*/
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+
+
 body {
   background-color: #F6F6F6;
 }
@@ -63,8 +67,9 @@ button {
   text-align: right;
 }
  
-#input {
+#input, #expression {
   font-size: 30px;
+  font-family: 'Black Ops One', cursive;
 }
 
 
