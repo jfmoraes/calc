@@ -1,12 +1,5 @@
 
-
 var calculator = {
-  startup: function () {
-    calculator.insertValueOnTHML();
-    calculator.insertOperatorOnHTML();
-    calculator.defaultInput();
-    calculator.onclickFunction();
-  },
   evaluation: null,
   expression: [],
   expressionLocale: [],
@@ -43,6 +36,7 @@ var calculator = {
   },
   resetDigitQueue: function () {
     calculator.digitQueue = []
+    return calculator.defaultInput()
   },
   insertValueOnTHML: function () {
     for(var digit in this.digits){
@@ -65,7 +59,7 @@ var calculator = {
           case "clearEntry":
             calculator.clearEntry()
             break;
-          case "lastDigit":
+          case "clearLastDigit":
             calculator.clearLastDigit()
             break;
           case "digit":
@@ -111,6 +105,7 @@ var calculator = {
   },
   addDigit: function (digit) {
     // If an operator was issued, we reset the digitQueue to allow a new number composition 
+    // Dealing with a lParen and rParen variables would add more complexity
     if (this.operator) {
       this.operator = null
       calculator.resetDigitQueue()
@@ -118,11 +113,11 @@ var calculator = {
     calculator.digitQueue.push(digit)
     this.userInput = this.stringToNumber()
     this.userInputLocale = this.numberToLocaleString()
+    // TODO: Float number support
     //var isFloat = parseFloat(calculator.digitQueue.join(""), 10)
     //var isInteger = parseInt(calculator.digitQueue.join(""), 10)
     return calculator.renderUserInput()
   },
-
   addition: function () {
     this.operator = "+"
     return calculator.setExpression()
@@ -160,27 +155,41 @@ var calculator = {
     this.setExpression();
     var evaluation = eval(calculator.expression.join(""))
     calculator.appendHistoryChild()
-    return calculator.updateUserInput(evaluation)
+    calculator.updateUserInput(evaluation)
+    return this.clearHistory()
   },
   appendHistoryChild: function () {
+    // TODO: Need an improvent
     var history = document.getElementById("history")
     var li = document.createElement("li")
     var textNode = document.createTextNode(calculator.expression.join(""))
     li.appendChild(textNode)
     return history.appendChild(li)
   },
-  clearHistory: function () {
-    this.expression = []
-    this.history = []
-  },
+
   clear: function () {
+    // TODO: Need an improvement
+    calculator.clearHistory()
     return calculator.defaultInput()
   },
   clearEntry: function () {
+    // TODO: Need an improvement
     return calculator.resetDigitQueue()
   },
   clearLastDigit: function () {
-    
+    // TODO: Need an improvement
+    calculator.digitQueue.pop()
+    let newInput = calculator.digitQueue.join("")
+    calculator.digitQueue = []
+    return calculator.updateUserInput(newInput)
+  },
+  clearHistory: function () {
+    // TODO: Need an improvement
+    this.history = []
+    this.expression = []
+    this.expressionLocale = []
+    calculator.renderExpression()
+    return;
   },
   updateUserInput: function (userInput) {
     var input = userInput.toString()
@@ -189,7 +198,7 @@ var calculator = {
         calculator.addDigit(input[digit])
       }
     }
-    return this.clearHistory()
+    return;
   },
   setExpression: function () {
     if (this.operator !== '=') {  
@@ -205,14 +214,18 @@ var calculator = {
     return output.innerText = calculator.expressionLocale.join("")
   },
   renderUserInput: function () {
-    // The current userInput is always displayed or replaced by an evaluation
+    // The current userInput is always displayed
     var input = document.getElementById("input")
     if (this.userInput >= 0) {
       input.innerText = `${this.userInputLocale}`
     }
+  },
+  startup: function () {
+    calculator.insertValueOnTHML();
+    calculator.insertOperatorOnHTML();
+    calculator.defaultInput();
+    calculator.onclickFunction();
   }
-
-
 }
 
 window.onload = calculator.startup()
