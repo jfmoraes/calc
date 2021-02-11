@@ -1,14 +1,14 @@
 
 var calculator = {
-  evaluation: null,
   expression: [],
   expressionLocale: [],
-  digitQueue: [],
   userInput: null,
   userInputLocale: null,
   operator: null,
   operatorLocale: null,
+  digitQueue: [],
   operatorStack: [],
+  history: [],
   digits: {
     "zero": 0,
     "one": 1,
@@ -30,13 +30,16 @@ var calculator = {
     "equality": "=",
     "comma": ","
   },
-  history: [],
+  inputElement: document.getElementById("input"),
+  expressionElement: document.getElementById("expression"),
   defaultInput: function () {
-    return calculator.addDigit(0)
+    calculator.addDigit(0)
+    return;
   },
   resetDigitQueue: function () {
     calculator.digitQueue = []
-    return calculator.defaultInput()
+    calculator.defaultInput()
+    return;
   },
   insertValueOnTHML: function () {
     for(var digit in this.digits){
@@ -105,7 +108,6 @@ var calculator = {
   },
   addDigit: function (digit) {
     // If an operator was issued, we reset the digitQueue to allow a new number composition 
-    // Dealing with a lParen and rParen variables would add more complexity
     if (this.operator) {
       this.operator = null
       calculator.resetDigitQueue()
@@ -116,23 +118,24 @@ var calculator = {
     // TODO: Float number support
     //var isFloat = parseFloat(calculator.digitQueue.join(""), 10)
     //var isInteger = parseInt(calculator.digitQueue.join(""), 10)
-    return calculator.renderUserInput()
+    calculator.renderUserInput()
+    return;
   },
   addition: function () {
     this.operator = "+"
-    return calculator.setExpression()
+    return calculator.pushExpression()
   },
   subtraction: function () {
     this.operator = "-"
-    return calculator.setExpression()
+    return calculator.pushExpression()
   },
   division: function () {
     this.operator = "/"
-    return calculator.setExpression()
+    return calculator.pushExpression()
   },
   multiplication: function () {
     this.operator = "*";
-    return calculator.setExpression()
+    return calculator.pushExpression()
   },
   unary: function () {
     if (calculator.digitQueue) {
@@ -152,39 +155,42 @@ var calculator = {
   },
   equals: function () {
     this.operator = "=";
-    this.setExpression();
-    var evaluation = eval(calculator.expression.join(""))
-    calculator.appendHistoryChild()
-    calculator.updateUserInput(evaluation)
-    return this.clearHistory()
+    this.pushExpression();
+
+    var evaluation = eval(this.expression.join(""))
+
+    calculator.updateUserInput(evaluation);
+    calculator.pushExpression();
+    calculator.renderExpression();
+    calculator.appendHistoryChild();
+    //this.clearHistory();
+    return;
   },
   appendHistoryChild: function () {
-    // TODO: Need an improvent
     var history = document.getElementById("history")
     var li = document.createElement("li")
-    var textNode = document.createTextNode(calculator.expression.join(""))
+    var textNode = document.createTextNode(calculator.expressionLocale.join(""))
     li.appendChild(textNode)
-    return history.appendChild(li)
+    history.appendChild(li)
+    return;
   },
-
   clear: function () {
-    // TODO: Need an improvement
     calculator.clearHistory()
-    return calculator.defaultInput()
+    calculator.defaultInput()
+    return;
   },
   clearEntry: function () {
-    // TODO: Need an improvement
-    return calculator.resetDigitQueue()
+    calculator.resetDigitQueue();
+    return;
   },
   clearLastDigit: function () {
-    // TODO: Need an improvement
     calculator.digitQueue.pop()
     let newInput = calculator.digitQueue.join("")
     calculator.digitQueue = []
-    return calculator.updateUserInput(newInput)
+    calculator.updateUserInput(newInput)
+    return;
   },
   clearHistory: function () {
-    // TODO: Need an improvement
     this.history = []
     this.expression = []
     this.expressionLocale = []
@@ -194,31 +200,35 @@ var calculator = {
   updateUserInput: function (userInput) {
     var input = userInput.toString()
     if (input.length >= 1) {
-      for (let digit = 0; digit < input.length ; digit++){
+      for (let digit = 0; digit < input.length; digit++){
+        console.log(typeof input[digit], input[digit])
         calculator.addDigit(input[digit])
       }
     }
     return;
   },
-  setExpression: function () {
-    if (this.operator !== '=') {  
-      calculator.expression.push(this.userInput, this.operator)
-    } else {
+  pushExpression: function () {
+    // TODO: Need an improvement
+    
+    if (this.operator === '=') { 
       calculator.expression.push(this.userInput)
+    } else {
+      calculator.expression.push(this.userInput, this.operator)
     }
     calculator.expressionLocale.push(this.userInput, this.operator)
+    console.log(calculator.expression, calculator.expressionLocale)
     return calculator.renderExpression()
   },
   renderExpression: function () {
-    var output = document.getElementById("expression")
-    return output.innerText = calculator.expressionLocale.join("")
+    calculator.expressionElement.innerText = calculator.expressionLocale.join("")
+    return;
   },
   renderUserInput: function () {
     // The current userInput is always displayed
-    var input = document.getElementById("input")
     if (this.userInput >= 0) {
-      input.innerText = `${this.userInputLocale}`
+      this.inputElement.innerText = `${this.userInputLocale}`
     }
+    return;
   },
   startup: function () {
     calculator.insertValueOnTHML();

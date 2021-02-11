@@ -54,48 +54,51 @@ table {
 /* DEFAULT */
 
 body {
-  *background-color: #F6F6F6;
+  background-color: #F6F6F6;
 }
 
 #container {
   display: flex;
-  height: 700px;
   margin: auto;
+  width: 95%;
+}
+
+#header {
   width: 100%;
 }
 
-#column {
+#main {
   display: flex;
-  flex-direction: column;
-  
-  width: 70%;
 }
 
-
-
-#output {
-  background-color: black;
-  color: white;
+.column {
   display: flex;
-  height: 50%;
   flex-direction: column;
-  width: 100%;
 }
 
 #calculator {
-  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 70%;
 }
 
 #sidebar {
-  background-color: pink;
   height: 100%;
   width: 30%;
 }
 
+#output {
+  color: black;
+  display: flex;
+  height: 350px;
+  flex-direction: column;
+  width: 100%;
+}
 
-table {
+
+#table {
   background-color: #F6F6F6;
-  align-content: center;
   width: 100%;
 }
 
@@ -125,13 +128,17 @@ button {
 }
 
 #expression, #evaluation {
-  color: white;
+  color: black;
   text-align: right;
 }
  
 #input, #expression {
   font-size: 30px;
   font-family: 'Black Ops One', cursive;
+}
+
+#history {
+  text-align: right;
 }
 
 li {
